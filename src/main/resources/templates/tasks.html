@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Things</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --sand-50:  #FAF8F4;
+            --sand-100: #F0EDE6;
+            --sand-200: #DDD9CF;
+            --ink:      #1A1916;
+            --ink-muted:#6B6760;
+            --accent:   #C8502A;
+            --accent-light: #F7EDE8;
+            --done-line: #A3A09B;
+            --radius-card: 18px;
+            --shadow-card: 0 2px 12px 0 rgba(26,25,22,0.07);
+            --shadow-hover: 0 6px 28px 0 rgba(26,25,22,0.13);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--sand-50);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-shell {
+            display: grid;
+            grid-template-columns: 1fr min(680px, 100%) 1fr;
+            padding: 4rem 1.5rem 6rem;
+        }
+        .page-shell > * { grid-column: 2; }
+
+        .page-header { margin-bottom: 2.5rem; }
+        .page-header .eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--ink-muted);
+            margin-bottom: 6px;
+        }
+        .page-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2.4rem, 6vw, 3.6rem);
+            font-weight: 400;
+            line-height: 1.05;
+            color: var(--ink);
+            margin: 0;
+        }
+        .page-header h1 em { font-style: italic; color: var(--accent); }
+
+        .add-form-wrap {
+            background: #fff;
+            border-radius: var(--radius-card);
+            padding: 8px;
+            display: flex;
+            gap: 8px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 2rem;
+            border: 1px solid var(--sand-200);
+        }
+        .add-form-wrap input[type="text"] {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            color: var(--ink);
+            background: transparent;
+            padding: 10px 14px;
+        }
+        .add-form-wrap input[type="text"]::placeholder { color: var(--done-line); }
+        .btn-add {
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.18s, transform 0.12s;
+            white-space: nowrap;
+        }
+        .btn-add:hover  { background: #333; }
+        .btn-add:active { transform: scale(0.97); }
+
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 1.5rem;
+            font-size: 13px;
+            color: var(--ink-muted);
+        }
+        .stats-bar span strong { color: var(--ink); font-weight: 500; }
+
+        .task-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .task-card {
+            background: #fff;
+            border-radius: var(--radius-card);
+            border: 1px solid var(--sand-200);
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: var(--shadow-card);
+            transition: box-shadow 0.2s, transform 0.15s;
+        }
+        .task-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+        .task-card.is-done { background: var(--sand-100); box-shadow: none; }
+        .task-card.is-done:hover { transform: none; box-shadow: none; }
+
+        .btn-toggle {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--sand-200);
+            background: transparent;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.18s, background 0.18s;
+            padding: 0;
+        }
+        .btn-toggle:hover { border-color: var(--accent); }
+        .is-done .btn-toggle { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        .task-title { flex: 1; font-size: 15px; font-weight: 400; color: var(--ink); line-height: 1.4; }
+        .is-done .task-title { color: var(--done-line); text-decoration: line-through; text-decoration-color: var(--done-line); }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: var(--done-line);
+            cursor: pointer;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.18s, background 0.18s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        .btn-delete:hover { color: var(--accent); background: var(--accent-light); }
+
+        .action-form { margin: 0; padding: 0; }
+
+        .empty-state { text-align: center; padding: 3rem 0; color: var(--ink-muted); }
+        .empty-state i { font-size: 2.5rem; display: block; margin-bottom: 1rem; opacity: 0.3; }
+        .empty-state p { font-size: 15px; margin: 0; }
+
+        .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--done-line);
+            padding: 6px 4px 4px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+
+    <div class="page-header">
+        <h1>Get Things<br><em>done.</em></h1>
+    </div>
+
+    <form action="/" method="POST" class="add-form-wrap">
+        <input type="text" name="title" placeholder="What needs to be done?" required autocomplete="off">
+        <button type="submit" class="btn-add">
+            <i class="ti ti-plus" aria-hidden="true" style="font-size:16px;"></i>
+            Add task
+        </button>
+    </form>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" th:if="${tasks != null and !#lists.isEmpty(tasks)}">
+        <span><strong th:text="${#lists.size(tasks)}">0</strong> total</span>
+        <span><strong th:text="${#lists.size(pendingTasks)}">0</strong> remaining</span>
+        <span><strong th:text="${#lists.size(doneTasks)}">0</strong> done</span>
+    </div>
+
+    <div class="task-list">
+
+        <!-- Active tasks -->
+        <div th:each="task : ${pendingTasks}" class="task-card">
+            <form th:action="@{/{id}(id=${task.id})}" th:method="put" class="action-form">
+                <button type="submit" class="btn-toggle" aria-label="Mark complete">
+                    <i class="ti ti-check" style="font-size:13px;" aria-hidden="true"></i>
+                </button>
+            </form>
+            <span class="task-title" th:text="${task.title}">Task title</span>
+            <form th:action="@{/{id}(id=${task.id})}" th:method="delete" class="action-form">
+                <button type="submit" class="btn-delete" aria-label="Delete task">
+                    <i class="ti ti-trash" style="font-size:17px;" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" th:if="${#lists.isEmpty(tasks)}">
+            <i class="ti ti-clipboard-check" aria-hidden="true"></i>
+            <p>All clear — add a task above.</p>
+        </div>
+
+        <!-- Completed section -->
+        <th:block th:if="${!#lists.isEmpty(doneTasks)}">
+            <p class="section-label">Completed</p>
+            <div th:each="task : ${doneTasks}" class="task-card is-done">
+                <form th:action="@{/{id}(id=${task.id})}" th:method="put" class="action-form">
+                    <button type="submit" class="btn-toggle" aria-label="Mark incomplete">
+                        <i class="ti ti-check" style="font-size:13px;" aria-hidden="true"></i>
+                    </button>
+                </form>
+                <span class="task-title" th:text="${task.title}">Done task</span>
+                <form th:action="@{/{id}(id=${task.id})}" th:method="delete" class="action-form">
+                    <button type="submit" class="btn-delete" aria-label="Delete task">
+                        <i class="ti ti-trash" style="font-size:17px;" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+        </th:block>
+
+    </div>
+</div>
+</body>
+</html>
