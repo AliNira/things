@@ -1,3 +1,5 @@
+![Application Screenshot](screenshots/Screenshot.png)
+
 # Things — A Minimal Task Manager
 
 A clean, modern to-do web application built with Spring Boot and Thymeleaf.
